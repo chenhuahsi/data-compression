@@ -2,6 +2,10 @@
 #ifndef __ifp_data_compress_h
 #define __ifp_data_compress_h
 
+#define CONFIG_LZW 0
+#define SIGN_EXT 1
+
+
 #if defined(CONFIG_LZW) || CONFIG_LZW == 0
 
 #include <stdio.h>
@@ -39,6 +43,7 @@ typedef struct __MetaData {
 	uint8 headerLength;
 	int16 pixel0;
 	int8 dataType;
+	uint16 crc16;
 } MetaData;
 
 typedef struct __BITMASK_INFO {
@@ -53,6 +58,8 @@ void memset16_local(uint16 *p, uint16 c, uint16 len);
 int compress_data_one_frame(uint16 *rawImage_this_frame, void *compressedBinary, int datatype);
 int compress_data_two_continuous_frames(uint16 *rawImage_last_frame, uint16 *rawImage_this_frame, void *compressedBinary, int datatype);
 int get_decompress_data(void *compressedBinary, int length, int16* decompressedData, int16* lastFrameData);
+
+unsigned short CRC16_CCITT(unsigned char *puchMsg, unsigned int usDataLen);
 
 #endif
 

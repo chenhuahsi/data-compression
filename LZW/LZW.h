@@ -1,8 +1,6 @@
 #ifndef __LZW_h
 #define __LZW_h
 
-#define CONFIG_LZW 1
-
 #include "ifp_data_compress.h"
 
 enum {

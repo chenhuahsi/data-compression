@@ -39206,6 +39206,8 @@ extern int leftover;
 #endif
 
 void verify_one_frame() {
+	MetaData* metaData;
+
 	int frame_counts = sizeof(frameData) / sizeof(FrameData_t);
 	//int frame_counts = 1;
 
@@ -39247,7 +39249,8 @@ void verify_one_frame() {
 #else
 		int length = compress_data_one_frame(frameData[frameIndex].raw, mCompressedBinary_frame, DATA_TYPE_RAW);
 #endif
-
+		metaData = (MetaData*)mCompressedBinary_frame;
+		metaData->crc16 = CRC16_CCITT((unsigned char*)frameData[frameIndex].raw, MAX_TX*MAX_RX * 2);
 
 		if (length >= maxLength) {
 			maxLength = length;
@@ -39282,6 +39285,14 @@ void verify_one_frame() {
 #else
 		get_decompress_data(mCompressedBinary_frame, length, decompressed_data_frame_this, NULL);
 		print_to_file(file, decompressed_data_frame_this, frameIndex, length);
+
+		uint16 crc16 = CRC16_CCITT((unsigned char*)decompressed_data_frame_this, MAX_TX*MAX_RX * 2);
+
+		if (crc16 != metaData->crc16)
+		{
+			printf("\n!!! CRC Error: frame=%d, Expect = %d, got = %d\n", frameIndex, metaData->crc16, crc16);
+			err_result = 1;
+		}
 #endif
 
 #if 1

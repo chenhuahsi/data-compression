@@ -135,8 +135,13 @@ int determine_longbits(int16 max, int16 min) {
     int maxindex = sizeof(m_bitmask_Infos) / sizeof(BITMASK_INFO);
     int i = 0;
 
+#if defined(SIGN_EXT) && (SIGN_EXT==1)
+	max = (max > 0) ? max : (myabs(max) - 1);
+	min = (min > 0) ? min : (myabs(min) - 1);
+#else
     max = myabs(max);
     min = myabs(min);
+#endif
 
     value = max > min ? max : min;
 
@@ -213,7 +218,12 @@ int compress_data(int16* data_to_be_compressed, int bitmask_index, void *compres
             headerByteIndex = pixelIndex / 8;
             bitIndexInheaderByte = mymod(pixelIndex, 8);
 
+#if defined(SIGN_EXT) && (SIGN_EXT == 1)
+			int16 check_value = (deltaValue < 0) ? -deltaValue - 1 : deltaValue;
+			if (check_value >= small_threshold) {
+#else
             if (myabs(deltaValue) >= small_threshold) {
+#endif
                 header[headerByteIndex] |= 1 << bitIndexInheaderByte;
 
                 bits = longbits;
@@ -226,11 +236,15 @@ int compress_data(int16* data_to_be_compressed, int bitmask_index, void *compres
                 bitmask = smallmask;
             }
 
+#if defined(SIGN_EXT) && (SIGN_EXT == 1)
+			data = deltaValue & ((1 << bits) - 1);
+#else
             data = myabs(deltaValue) & bitmask;
 
             if (deltaValue < 0) {
                 data |= 1 << (bits - 1);
             }
+#endif
 
             if (remaingBits >= bits) {
                 data = data << (16 - remaingBits);
@@ -423,12 +437,22 @@ int decompress_binary_data(void *compressedBinary, int length, int16* decompress
 
         sum = highPart + lowPart;
 
+#if defined(SIGN_EXT) && (SIGN_EXT==1)
+		decompressedData[pixelIndex] = sum;
+
+		int16 sign_bit = (1 << (bits - 1));
+		if (sum >= sign_bit)
+		{
+			decompressedData[pixelIndex] -= sign_bit * 2;
+		}
+#else
         decompressedData[pixelIndex] = sum & m_bitmask_Infos[bits].bitmask;
 
         sign = sum & (1 << (bits - 1));
         if (sign != 0) {
             decompressedData[pixelIndex] *= -1;
         }
+#endif
     }
 
     return 0;
