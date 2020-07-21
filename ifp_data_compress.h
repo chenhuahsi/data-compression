@@ -2,7 +2,7 @@
 #ifndef __ifp_data_compress_h
 #define __ifp_data_compress_h
 
-#define CONFIG_LZW 0
+#define CONFIG_LZW 1
 #define SIGN_EXT 1
 
 

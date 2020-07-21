@@ -39443,27 +39443,77 @@ int main()
 #endif
 
 #if 1
-	char filename[100] = "C:\Users\whsi\git\data-compression\test_case\test_.tar";
-	FILE *file = fopen(filename, "rb");
+#define LZW_ENCODE 0
+#define LZW_DECODE 1
 
-	if (file == NULL) {
+	struct stat st;
+
+	char filename_ori[] = "C:\\Users\\whsi\\git\\data-compression\\test_case\\test_0.tar";
+	char filename_lzw[] = "test_0.tar.lzw";
+	char filename_dec[] = "test_0_dec.tar";
+
+	FILE *filename_ori_ptr;
+	FILE* filename_lzw_ptr;
+	FILE* filename_dec_ptr;
+
+	uint16 in_ptr[1024 * 1024 * 50 / 2];
+
+#if LZW_ENCODE
+	filename_ori_ptr = fopen(filename_ori, "rb");
+
+	if (filename_ori_ptr == NULL) {
 		printf("Can't open file\n'");
 		return -1;
 	}
 
-	struct stat st;
-	stat(filename, &st);
-	int lzw_file_size = st.st_size;
+	stat(filename_ori, &st);
+	int file_ori_size = st.st_size;
 
-
-	uint16 in_ptr[1024*1024*13/2];
-	//uint16 in_ptr[1024];
 	size_t read_num;
 
-	int NUM = MAX_TX * MAX_RX;
+	read_num = fread(in_ptr, sizeof(uint16), file_ori_size /2, filename_ori_ptr);
+	fclose(filename_ori_ptr);
 
-	read_num = fread(in_ptr, sizeof(uint16), lzw_file_size/2, file);
+	filename_lzw_ptr = fopen(filename_lzw, "wb");
+	if (filename_lzw_ptr == NULL) {
+		printf("compress_LZW:failed to open file\n");
+		return -1;
+	}
 
+	leftover = 0;
+
+	int length = compress_LZW(in_ptr, filename_lzw_ptr, file_ori_size);
+
+	fflush(filename_lzw_ptr);
+	fclose(filename_lzw_ptr);
+#endif
+
+//===========================
+// Decompress
+//===========================
+
+#if LZW_DECODE
+	filename_lzw_ptr = fopen(filename_lzw, "rb");
+	if (filename_lzw_ptr == NULL) {
+		printf("decompress_LZW: failed to open file%s\n", filename_lzw);
+		return -1; 
+	}
+	stat(filename_lzw, &st);
+	int lzw_file_size = st.st_size;
+
+	filename_dec_ptr = fopen(filename_dec, "wb");
+	if (filename_dec_ptr == NULL) {
+		printf("compress_LZW:failed to open file: %s\n", filename_dec);
+		return -1;
+	}
+
+	leftover = 0;
+
+	//printf("***** Decompress Frame: %d\n", frameIndex);
+	decompress_LZW(filename_lzw_ptr, filename_dec_ptr, (char*)in_ptr, lzw_file_size);
+	fclose(filename_lzw_ptr);
+	fclose(filename_dec_ptr);
+#endif
 #else
 	verify_one_frame();
 	verify_two_frames();
