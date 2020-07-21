@@ -39453,7 +39453,7 @@ int main()
 	char filename_lzw[] = "test_0.lzw";
 	//char filename_lzw[] = "C:\\Users\\whsi\\git\\data-compression\\test_case\\test_0.lzw";
 
-	char filename_dec[] = "test_1.dec";
+	char filename_dec[] = "test_0.dec";
 
 	FILE *filename_ori_ptr;
 	FILE* filename_lzw_ptr;
