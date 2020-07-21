@@ -39442,8 +39442,32 @@ int main()
 
 #endif
 
+#if 1
+	char filename[100] = "C:\Users\whsi\git\data-compression\test_case\test_.tar";
+	FILE *file = fopen(filename, "rb");
+
+	if (file == NULL) {
+		printf("Can't open file\n'");
+		return -1;
+	}
+
+	struct stat st;
+	stat(filename, &st);
+	int lzw_file_size = st.st_size;
+
+
+	uint16 in_ptr[1024*1024*13/2];
+	//uint16 in_ptr[1024];
+	size_t read_num;
+
+	int NUM = MAX_TX * MAX_RX;
+
+	read_num = fread(in_ptr, sizeof(uint16), lzw_file_size/2, file);
+
+#else
 	verify_one_frame();
 	verify_two_frames();
+#endif
 
 	return 0;
 }
