@@ -4,8 +4,8 @@
 #include "ifp_data_compress.h"
 
 enum {
-	dictionarySize = 1023, //4095, // maximum number of entries defined for the dictionary (2^12 = 4096)
-	codeLength = 10, //12, // the codes which are taking place of the substrings
+	dictionarySize = 4095, //1023, //4095, // maximum number of entries defined for the dictionary (2^12 = 4096)
+	codeLength = 12, //10, //12, // the codes which are taking place of the substrings
 	maxValue = dictionarySize - 1
 };
 

@@ -39443,7 +39443,7 @@ int main()
 #endif
 
 #if 1
-#define LZW_ENCODE 0
+#define LZW_ENCODE 1
 #define LZW_DECODE 1
 
 	struct stat st;
@@ -39456,7 +39456,7 @@ int main()
 	FILE* filename_lzw_ptr;
 	FILE* filename_dec_ptr;
 
-	uint16 in_ptr[1024 * 1024 * 50 / 2];
+	uint16 in_ptr[1024 * 1024 * 60 / 2];
 
 #if LZW_ENCODE
 	filename_ori_ptr = fopen(filename_ori, "rb");
